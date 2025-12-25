@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -23,6 +24,7 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
+  FieldSeparator,
 } from "@/components/ui/field";
 import {
   Form,
@@ -53,6 +55,9 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formError, setFormError] = useState<string | null>(null);
+  const [oauthPending, setOauthPending] = useState<"google" | "github" | null>(
+    null
+  );
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -86,6 +91,28 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
       router.refresh();
     } catch (error) {
       setFormError("Something went wrong. Please try again.");
+    }
+  };
+
+  const handleOAuth = async (provider: "google" | "github") => {
+    setFormError(null);
+    setOauthPending(provider);
+    const callbackURL = searchParams.get("callbackUrl") ?? "/";
+
+    try {
+      const { error } = await authClient.signIn.social({
+        provider,
+        callbackURL,
+        requestSignUp: true,
+      });
+
+      if (error) {
+        setFormError(error.message ?? "Unable to continue with OAuth.");
+        setOauthPending(null);
+      }
+    } catch (error) {
+      setFormError("Something went wrong. Please try again.");
+      setOauthPending(null);
     }
   };
 
@@ -205,6 +232,39 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
                   <Button type="submit" disabled={isPending}>
                     {isPending ? "Creating account..." : "Create account"}
                   </Button>
+                  <FieldSeparator>or continue with</FieldSeparator>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!!oauthPending}
+                      onClick={() => handleOAuth("google")}
+                    >
+                      <Image
+                        src="/google.png"
+                        alt="Google"
+                        width={18}
+                        height={18}
+                        className="mr-2"
+                      />
+                      Google
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!!oauthPending}
+                      onClick={() => handleOAuth("github")}
+                    >
+                      <Image
+                        src="/github.png"
+                        alt="GitHub"
+                        width={18}
+                        height={18}
+                        className="mr-2"
+                      />
+                      GitHub
+                    </Button>
+                  </div>
                   <FieldDescription className="text-center">
                     Already have an account?{" "}
                     <Link

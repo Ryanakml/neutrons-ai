@@ -1,15 +1,17 @@
 import { requireAuth } from "@/lib/auth-utils";
-import { caller } from "@/trpc/server";
+import { createCaller } from "@/trpc/server";
 import { LogoutButton } from "./features/components/logout-button";
+import { WorkflowsClient } from "./features/components/workflows-client";
 
 const Page = async () => {
-  await requireAuth(); // Note: Added () to call the function
+  await requireAuth();
 
-  const data = await caller.getUsers();
+  const caller = await createCaller();
+  const data = await caller.getWorkflows();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+      <WorkflowsClient initialData={data} />
       <LogoutButton />
     </div>
   );

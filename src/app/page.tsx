@@ -7,11 +7,16 @@ const Page = async () => {
   await requireAuth();
 
   const caller = await createCaller();
+  // Mengambil data awal untuk ditampilkan di list
   const data = await caller.getWorkflows();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 gap-6">
+      <h1 className="text-2xl font-bold">Workflow Dashboard</h1>
+
+      {/* Mengirim data awal ke client */}
       <WorkflowsClient initialData={data} />
+
       <LogoutButton />
     </div>
   );

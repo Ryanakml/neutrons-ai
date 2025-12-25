@@ -79,5 +79,5 @@ model Verification {
 model Workflow {
   id   String @id @default(cuid())
   name String
+  aiResult String?
 }
-

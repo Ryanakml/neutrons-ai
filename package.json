@@ -7,7 +7,9 @@
     "dev:prisma": "npx prisma studio",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "inngest:dev": "npx inngest-cli@latest dev",
+    "dev:all": "mprocs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -51,6 +53,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "embla-carousel-react": "^8.6.0",
+    "inngest": "^3.48.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
@@ -77,6 +80,8 @@
     "autoprefixer": "^10.4.23",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "inngest-cli": "^1.15.3",
+    "mprocs": "^0.8.2",
     "postcss": "^8.5.6",
     "prisma": "^7.2.0",
     "tailwindcss": "^4.1.18",

@@ -1,30 +1,39 @@
-import { createTRPCRouter, protectedProcedure } from "../init";
-import { prisma } from "../../lib/db";
 import { inngest } from "@/inngest/client";
-import { success } from "zod";
+import { prisma } from "../../lib/db";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const appRouter = createTRPCRouter({
   getWorkflows: protectedProcedure.query(() => {
-    if (!prisma) {
-      throw new Error("Prisma client is not initialized");
-    }
-
     return prisma.workflow.findMany({
       select: {
         id: true,
         name: true,
+        aiResult: true,
       },
     });
   }),
+
   createWorkflow: protectedProcedure.mutation(async () => {
-    await inngest.send({
-      name: "test/hello.world",
+    const created = await prisma.workflow.create({
       data: {
-        email: "m@no.com",
+        name: "New workflow",
+      },
+      select: {
+        id: true,
+        name: true,
+        aiResult: true,
       },
     });
 
-    return { success: true, message: "job queued" };
+    await inngest.send({
+      name: "workflow/ai.generate",
+      data: {
+        workflowId: created.id,
+        prompt: `Berikan deskripsi singkat untuk workflow bernama "${created.name}".`,
+      },
+    });
+
+    return created;
   }),
 });
 

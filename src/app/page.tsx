@@ -1,7 +1,7 @@
 import { requireAuth } from "@/lib/auth-utils";
 import { createCaller } from "@/trpc/server";
-import { LogoutButton } from "./features/components/logout-button";
-import { WorkflowsClient } from "./features/components/workflows-client";
+import { LogoutButton } from "../features/components/logout-button";
+import { WorkflowsClient } from "../features/components/workflows-client";
 
 const Page = async () => {
   await requireAuth();

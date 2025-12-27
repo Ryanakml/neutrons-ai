@@ -2,17 +2,29 @@ import { PAGINATION } from "@/config/constants";
 import { prisma } from "@/lib/db";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { z } from "zod";
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  animals,
+  colors,
+} from "unique-names-generator";
 
 export const workflowsRouter = createTRPCRouter({
   // Create workflow baru
-  create: protectedProcedure.mutation(async ({ ctx }) => {
-    return prisma.workflow.create({
-      data: {
-        name: "minombre",
-        userId: ctx.auth.user.id,
-      },
-    });
-  }),
+  create: protectedProcedure
+    .input(z.object({ name: z.string().min(1).optional() }).optional())
+    .mutation(async ({ ctx, input }) => {
+      const randomName = uniqueNamesGenerator({
+        dictionaries: [animals],
+        separator: "-",
+      });
+      return prisma.workflow.create({
+        data: {
+          name: input?.name ?? randomName,
+          userId: ctx.auth.user.id,
+        },
+      });
+    }),
 
   // Hapus workflow berdasarkan ID dan kepemilikan user
   remove: protectedProcedure

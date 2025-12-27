@@ -13,4 +13,13 @@ const AppHeader = () => {
   );
 };
 
-export default AppHeader;
+const RestLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="flex h-full w-full flex-col">
+      <AppHeader />
+      <div className="flex-1 w-full">{children}</div>
+    </div>
+  );
+};
+
+export default RestLayout;

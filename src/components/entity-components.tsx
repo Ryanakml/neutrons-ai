@@ -1,6 +1,28 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button"; // Asumsi menggunakan shadcn/ui
+import { Button } from "@/components/ui/button";
 import { PlusIcon, Loader2Icon } from "lucide-react";
+import React from "react";
+
+export const EntityContainer = ({
+  header,
+  search,
+  children,
+  pagination,
+}: {
+  header: React.ReactNode;
+  search: React.ReactNode;
+  children: React.ReactNode;
+  pagination: React.ReactNode;
+}) => {
+  return (
+    <div className="p-6 space-y-4">
+      {header}
+      {search}
+      <div className="min-h-[400px]">{children}</div>
+      {pagination}
+    </div>
+  );
+};
 
 type EntityHeaderProps = {
   title: string;

@@ -5,40 +5,43 @@ import {
   useCreateWorkflow,
   useSuspenseWorkflows,
 } from "../hooks/use-workflows";
-import { SearchIcon, ChevronLeft, ChevronRight, Link } from "lucide-react";
+import {
+  SearchIcon,
+  ChevronLeft,
+  ChevronRight,
+  PackageOpenIcon,
+  MoreVerticalIcon,
+  WorkflowIcon,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { EntityContainer, EntityHeader } from "@/components/entity-components";
+import {
+  EmptyView,
+  EntityContainer,
+  EntityHeader,
+  EntityList,
+  EntityListItem,
+  ErrorView,
+  LoadingView,
+} from "@/components/entity-components";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Workflow } from "../../../../generated/prisma/browser";
+import { formatDistanceToNow } from "date-fns";
+import { useRemoveWorkflow } from "@/features/components/workflows-client";
 
 export const WorkflowList = () => {
-  const { data } = useSuspenseWorkflows();
-
-  if (data.items.length === 0) {
-    return (
-      <div className="flex h-40 items-center justify-center text-muted-foreground border-2 border-dashed rounded-lg">
-        No workflows found.
-      </div>
-    );
-  }
+  // throw new Error("text error");
+  const workflows = useSuspenseWorkflows();
 
   return (
-    <div className="divide-y border rounded-lg bg-white">
-      {data.items.map((workflow) => (
-        <div
-          key={workflow.id}
-          className="p-4 flex justify-between items-center hover:bg-slate-50 transition"
-        >
-          <div>
-            <h3 className="font-medium">{workflow.name}</h3>
-            <p className="text-xs text-muted-foreground">ID: {workflow.id}</p>
-          </div>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={`/workflows/${workflow.id}`}>Open</Link>
-          </Button>
-        </div>
-      ))}
-    </div>
+    <EntityList
+      items={workflows.data.items}
+      getKey={(workflow) => workflow.id}
+      renderItem={(workflow) => <WorkflowListItem data={workflow} />}
+      emptyView={<WorkflowsEmptyView />}
+    />
   );
 };
 
@@ -60,13 +63,13 @@ export const WorkflowSearch = () => {
   }, [search]);
 
   return (
-    <div className="flex items-center gap-x-2 bg-white p-2 rounded-md border">
+    <div className="flex items-center gap-x-2 p-2 rounded-md border">
       <SearchIcon className="size-4 text-muted-foreground" />
       <Input
         placeholder="Search workflows..."
         value={localSearch}
         onChange={(e) => setLocalSearch(e.target.value)}
-        className="border-none focus-visible:ring-0"
+        className="border focus-visible:ring-0 shadow-sm"
       />
     </div>
   );
@@ -126,5 +129,80 @@ export const WorkflowsContainer = ({
     >
       {children}
     </EntityContainer>
+  );
+};
+
+export const WorkflowsLoadingView = () => {
+  return <LoadingView message="Loading workflows..." />;
+};
+
+export const WorkflowsErrorView = () => {
+  return <ErrorView message="Failed to load workflows" />;
+};
+
+export const WorkflowsEmptyView = () => {
+  const router = useRouter();
+  const [{ search }] = useWorkflowsParams();
+  const createWorkflow = useCreateWorkflow();
+
+  const handleCreate = () => {
+    createWorkflow.mutate(undefined, {
+      onError: (error) => {
+        toast.error(
+          `Failed to create workflow: ${error.message}. Please Try again`
+        );
+      },
+      onSuccess: (data) => {
+        toast.success("Workflow created successfully");
+        router.push(`/workflows/${data.id}`);
+      },
+    });
+  };
+
+  if (search) {
+    return (
+      <EmptyView
+        message={`Tidak ada hasil untuk "${search}". Mau buat workflow baru dengan nama ini?`}
+        onNew={handleCreate}
+      />
+    );
+  }
+
+  return (
+    <EmptyView
+      message="Belum ada workflow. Mulai otomatisasi pertamamu sekarang!"
+      onNew={handleCreate}
+    />
+  );
+};
+
+export const WorkflowListItem = ({ data }: { data: Workflow }) => {
+  const RemoveWorkflow = useRemoveWorkflow();
+
+  const handleRemove = () => {
+    RemoveWorkflow.mutate({ id: data.id });
+  };
+
+  return (
+    <EntityListItem
+      href={`/workflows/${data.id}`}
+      title={data.name}
+      subtitle={
+        <>
+          updated {formatDistanceToNow(data.updatedAt, { addSuffix: true })}
+          {""}
+          &bull; Created{""}
+          {formatDistanceToNow(data.createdAt, { addSuffix: true })}
+        </>
+      }
+      image={
+        <div className="size-9 rounded-md bg-primary/10 flex items-center justify-center border border-primary/20">
+          <WorkflowIcon className="size-5 text-primary" />
+        </div>
+      }
+      // Hapus actions={<MoreVerticalIcon />} karena sudah dihandle EntityListItem lewat onRemove
+      onRemove={handleRemove}
+      isRemoving={RemoveWorkflow.isPending}
+    />
   );
 };

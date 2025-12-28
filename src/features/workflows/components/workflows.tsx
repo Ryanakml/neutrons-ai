@@ -9,8 +9,6 @@ import {
   SearchIcon,
   ChevronLeft,
   ChevronRight,
-  PackageOpenIcon,
-  MoreVerticalIcon,
   WorkflowIcon,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -29,7 +27,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Workflow } from "../../../../generated/prisma/browser";
 import { formatDistanceToNow } from "date-fns";
-import { useRemoveWorkflow } from "@/features/components/workflows-client";
+import { useRemoveWorkflow } from "../hooks/use-workflows";
 
 export const WorkflowList = () => {
   // throw new Error("text error");

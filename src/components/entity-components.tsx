@@ -5,7 +5,6 @@ import {
   Loader2Icon,
   AlertTriangleIcon,
   PackageOpenIcon,
-  Trash2Icon,
   MoreVerticalIcon,
   TrashIcon,
 } from "lucide-react";
@@ -18,13 +17,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import { cn } from "@/lib/utils";
 import { DropdownMenu } from "./ui/dropdown-menu";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 

@@ -1,4 +1,14 @@
+import { prefetchWorkflow } from "@/features/workflows/server/prefetch";
 import { requireAuth } from "@/lib/auth-utils";
+import { HydrateClient } from "@/trpc/server";
+import { ErrorBoundary } from "react-error-boundary";
+import { Suspense } from "react";
+import {
+  Editor,
+  EditorError,
+  EditorLoading,
+} from "@/features/editor/components/editor";
+import { EditorHeader } from "@/features/editor/components/editor-header";
 
 interface PageProps {
   params: Promise<{
@@ -11,7 +21,25 @@ const Page = async ({ params }: PageProps) => {
 
   const { workflowId } = await params;
 
-  return <p>Workflow Id: {workflowId}</p>;
+  await prefetchWorkflow(workflowId);
+
+  return (
+    <HydrateClient>
+      <ErrorBoundary fallback={<EditorError />}>
+        <Suspense fallback={<EditorLoading />}>
+          {/* Container Utama: Tinggi layar penuh, susunan vertikal */}
+          <div className="flex flex-col h-screen overflow-hidden">
+            <EditorHeader workflowId={workflowId} />
+
+            {/* Main: Mengambil sisa ruang yang ada (flex-1) */}
+            <main className="flex-1 relative overflow-hidden bg-white">
+              <Editor workflowId={workflowId} />
+            </main>
+          </div>
+        </Suspense>
+      </ErrorBoundary>
+    </HydrateClient>
+  );
 };
 
 export default Page;

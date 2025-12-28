@@ -37,3 +37,54 @@ export const useCreateWorkflow = () => {
 
   return mutation;
 };
+
+export const useUpdateWorkflowName = () => {
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
+
+  const mutation = useMutation(
+    trpc.workflows.updateName.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(`Workflow ${data.name} updated successfully`);
+        queryClient.invalidateQueries({
+          queryKey: trpc.workflows.getMany.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.workflows.getOne.queryKey({ id: data.id }),
+        });
+      },
+      onError: (error) => {
+        toast.error(`Failed to update workflow: ${error.message}`);
+      },
+    })
+  );
+
+  return mutation;
+};
+
+export const useRemoveWorkflow = () => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.workflows.remove.mutationOptions(),
+    onSuccess: async (data) => {
+      toast.success(`Workflow ${data.name} removed`);
+      await queryClient.invalidateQueries({
+        queryKey: trpc.workflows.getMany.queryKey(),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: trpc.workflows.getOne.queryKey({ id: data.id }),
+      });
+    },
+    onError: (error) => {
+      toast.error(`Failed to remove workflow: ${error.message}`);
+    },
+  });
+};
+
+export const useSuspenseWorkflow = (id: string) => {
+  const trpc = useTRPC();
+
+  return useSuspenseQuery(trpc.workflows.getOne.queryOptions({ id }));
+};

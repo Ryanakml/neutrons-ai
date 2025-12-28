@@ -8,13 +8,14 @@ import type { AppRouter } from "@/trpc/routers/_app";
 import { inferRouterOutputs } from "@trpc/server";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
-type Workflow = RouterOutput["workflows"]["getMany"]["items"][number];
+type Workflow = RouterOutput["workflows"]["getMany"]["items"][number] & {
+  aiResult?: string;
+};
 
 export function WorkflowsClient({ initialData }: { initialData: Workflow[] }) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  // 1. Ambil list workflow
   const workflowsQuery = useQuery(
     trpc.workflows.getMany.queryOptions(
       { page: 1, pageSize: 100 },
@@ -74,15 +75,11 @@ export function WorkflowsClient({ initialData }: { initialData: Workflow[] }) {
                 <div className="font-semibold text-sm">{workflow.name}</div>
                 <div className="text-gray-500">{workflow.id}</div>
                 <div className="mt-2 text-gray-800 whitespace-pre-wrap">
-                  {/* @ts-ignore - aiResult might not exist on type yet if schema mismatch */}
                   {workflow.aiResult
-                    ? // @ts-ignore
-                      workflow.aiResult.split(" ").length > 10
-                      ? // @ts-ignore
-                        workflow.aiResult.split(" ").slice(0, 10).join(" ") +
+                    ? workflow.aiResult.split(" ").length > 10
+                      ? workflow.aiResult.split(" ").slice(0, 10).join(" ") +
                         "..."
-                      : // @ts-ignore
-                        workflow.aiResult
+                      : workflow.aiResult
                     : "AI masih memproses..."}
                 </div>
               </div>
@@ -93,24 +90,3 @@ export function WorkflowsClient({ initialData }: { initialData: Workflow[] }) {
     </div>
   );
 }
-
-export const useRemoveWorkflow = () => {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    ...trpc.workflows.remove.mutationOptions(),
-    onSuccess: async (data) => {
-      toast.success(`Workflow ${data.name} removed`);
-      await queryClient.invalidateQueries({
-        queryKey: trpc.workflows.getMany.queryKey(),
-      });
-      await queryClient.invalidateQueries({
-        queryKey: trpc.workflows.getOne.queryKey({ id: data.id }),
-      });
-    },
-    onError: (error) => {
-      toast.error(`Failed to remove workflow: ${error.message}`);
-    },
-  });
-};

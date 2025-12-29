@@ -27,11 +27,8 @@ const Page = async ({ params }: PageProps) => {
     <HydrateClient>
       <ErrorBoundary fallback={<EditorError />}>
         <Suspense fallback={<EditorLoading />}>
-          {/* Container Utama: Tinggi layar penuh, susunan vertikal */}
           <div className="flex flex-col h-screen overflow-hidden">
             <EditorHeader workflowId={workflowId} />
-
-            {/* Main: Mengambil sisa ruang yang ada (flex-1) */}
             <main className="flex-1 relative overflow-hidden bg-white">
               <Editor workflowId={workflowId} />
             </main>

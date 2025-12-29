@@ -84,7 +84,7 @@ export const EditorNameInput = ({ workflowId }: { workflowId: string }) => {
         onChange={(e) => setName(e.target.value)}
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
-        className="h-6 w-[200px] border-none shadow-none px-1 py-0 focus-visible:ring-1"
+        className="h-6 w-50 border-none shadow-none px-1 py-0 focus-visible:ring-1"
       />
     );
   }

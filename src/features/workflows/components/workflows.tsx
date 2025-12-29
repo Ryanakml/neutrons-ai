@@ -25,12 +25,17 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Workflow } from "../../../../generated/prisma/browser";
+
 import { formatDistanceToNow } from "date-fns";
 import { useRemoveWorkflow } from "../hooks/use-workflows";
+import type { AppRouter } from "@/trpc/routers/_app";
+import type { inferRouterOutputs } from "@trpc/server";
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type Workflow = RouterOutput["workflows"]["getMany"]["items"][number];
 
 export const WorkflowList = () => {
-  // throw new Error("text error");
+  // throw new Error("text error") for testing error laoding state;
   const workflows = useSuspenseWorkflows();
 
   return (
@@ -47,18 +52,24 @@ export const WorkflowSearch = () => {
   const [{ search }, setParams] = useWorkflowsParams();
 
   const [localSearch, setLocalSearch] = useState(search ?? "");
+  const [prevSearch, setPrevSearch] = useState(search ?? "");
 
+  // Sincronize state when rander
+  if (search !== prevSearch) {
+    setLocalSearch(search ?? "");
+    setPrevSearch(search ?? "");
+  }
+
+  // Debounce Effect
   useEffect(() => {
     const handler = setTimeout(() => {
-      setParams({ search: localSearch || null, page: 1 });
+      if (localSearch !== search) {
+        setParams({ search: localSearch || null, page: 1 });
+      }
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [localSearch, setParams]);
-
-  useEffect(() => {
-    setLocalSearch(search ?? "");
-  }, [search]);
+  }, [localSearch, search, setParams]);
 
   return (
     <div className="flex items-center gap-x-2 p-2 rounded-md border">
@@ -160,7 +171,7 @@ export const WorkflowsEmptyView = () => {
   if (search) {
     return (
       <EmptyView
-        message={`Tidak ada hasil untuk "${search}". Mau buat workflow baru dengan nama ini?`}
+        message={`No result for "${search}". Create new one with this name?`}
         onNew={handleCreate}
       />
     );
@@ -168,7 +179,7 @@ export const WorkflowsEmptyView = () => {
 
   return (
     <EmptyView
-      message="Belum ada workflow. Mulai otomatisasi pertamamu sekarang!"
+      message="There is no workflow. Create one to get started!"
       onNew={handleCreate}
     />
   );
@@ -198,7 +209,6 @@ export const WorkflowListItem = ({ data }: { data: Workflow }) => {
           <WorkflowIcon className="size-5 text-primary" />
         </div>
       }
-      // Hapus actions={<MoreVerticalIcon />} karena sudah dihandle EntityListItem lewat onRemove
       onRemove={handleRemove}
       isRemoving={RemoveWorkflow.isPending}
     />

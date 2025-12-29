@@ -3,11 +3,10 @@ import { prisma } from "@/lib/db";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { z } from "zod";
 import { uniqueNamesGenerator, animals } from "unique-names-generator";
-import { NodeType } from "../../../../generated/prisma";
+import { NodeType } from "@prisma-generated/index";
 import type { Edge, Node } from "@xyflow/react";
 
 export const workflowsRouter = createTRPCRouter({
-  // Create workflow baru
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1).optional() }).optional())
     .mutation(async ({ ctx, input }) => {
@@ -33,7 +32,6 @@ export const workflowsRouter = createTRPCRouter({
       });
     }),
 
-  // Hapus workflow berdasarkan ID dan kepemilikan user
   remove: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -45,7 +43,6 @@ export const workflowsRouter = createTRPCRouter({
       });
     }),
 
-  // Update nama workflow
   updateName: protectedProcedure
     .input(
       z.object({

@@ -1,6 +1,6 @@
 import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
-import { prisma } from "../lib/db";
+// import { prisma } from "../lib/db";
 import { inngest } from "./client";
 
 export const execute = inngest.createFunction(
@@ -24,12 +24,12 @@ export const execute = inngest.createFunction(
       return result.text;
     });
 
-    await step.run("update-database", async () => {
-      await prisma.workflow.update({
-        where: { id: workflowId },
-        data: { aiResult: text ?? "No result" },
-      });
-    });
+    // await step.run("update-database", async () => {
+    //   await prisma.workflow.update({
+    //     where: { id: workflowId },
+    //     data: { aiResult: text ?? "No result" },
+    //   });
+    // });
 
     return { workflowId, text };
   }

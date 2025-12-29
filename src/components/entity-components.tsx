@@ -41,7 +41,7 @@ export const EntityContainer = ({
     <div className="p-6 space-y-4">
       {header}
       {search}
-      <div className="min-h-[400px]">{children}</div>
+      <div className="min-h-100">{children}</div>
       {pagination}
     </div>
   );
@@ -102,9 +102,11 @@ export const EntityHeader = ({
   return (
     <div className="flex flex-row items-center justify-between gap-x-4 pb-4">
       <div className="flex flex-col">
-        <h1 className="text-lg md:text-xl font-semibold">{title}</h1>
+        <h1 className="text-lg md:text-xl font-bold">{title}</h1>
         {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p className="text-lg text-muted-foreground font-bold">
+            {description}
+          </p>
         )}
       </div>
       {renderButton()}
@@ -140,7 +142,7 @@ interface EmptyViewProps extends StateViewProps {
 
 export const EmptyView = ({ message, onNew }: EmptyViewProps) => {
   return (
-    <Empty className="border border-dashed min-h-[400px] flex flex-col items-center justify-center p-10 text-center">
+    <Empty className="border border-dashed min-h-100 flex flex-col items-center justify-center p-10 text-center">
       <EmptyHeader className="flex flex-col items-center">
         <EmptyMedia className="mb-4">
           <PackageOpenIcon className="size-16 text-muted-foreground/60" />

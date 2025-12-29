@@ -1,0 +1,85 @@
+"use client";
+
+import React, { memo } from "react";
+import Image from "next/image";
+import { Position, type NodeProps } from "@xyflow/react";
+import { LucideIcon } from "lucide-react";
+import { WorkflowNode } from "../../../components/workflow-node";
+import { BaseNode } from "../../../components/react-flow/base-node";
+import { BaseHandle } from "../../../components/react-flow/base-handle";
+
+export interface BaseExecutionNodeProps extends NodeProps {
+  icon: LucideIcon | string;
+  name: string;
+  description?: string;
+  children?: React.ReactNode;
+  onSettings?: () => void;
+  onDelete?: () => void;
+  onDoubleClick?: () => void;
+}
+
+export const BaseExecutionNode = memo(
+  ({
+    icon,
+    name,
+    description,
+    children,
+    onSettings,
+    onDelete,
+    onDoubleClick,
+  }: BaseExecutionNodeProps) => {
+    const handleDelete = () => {
+      if (onDelete) {
+        onDelete();
+        return;
+      }
+
+      console.log("Delete node triggered");
+    };
+
+    const renderIcon = () => {
+      if (typeof icon === "string") {
+        return (
+          <Image
+            src={icon}
+            alt={name}
+            width={20}
+            height={20}
+            className="object-contain"
+          />
+        );
+      }
+      const IconComponent = icon;
+      return <IconComponent className="size-5 text-slate-500" />;
+    };
+
+    return (
+      <WorkflowNode
+        name={name}
+        description={description}
+        onDelete={handleDelete}
+        onSettings={onSettings}
+        showToolbar
+      >
+        <div className="flex flex-col items-center gap-2">
+          <BaseNode
+            onDoubleClick={onDoubleClick}
+            className="relative flex h-14 w-14 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm"
+          >
+            {renderIcon()}
+
+            {/* Input Port */}
+            <BaseHandle id="target-1" type="target" position={Position.Left} />
+
+            {/* Output Port */}
+            <BaseHandle id="source-1" type="source" position={Position.Right} />
+          </BaseNode>
+
+          {children}
+        </div>
+      </WorkflowNode>
+    );
+  }
+);
+
+BaseExecutionNode.displayName = "BaseExecutionNode";

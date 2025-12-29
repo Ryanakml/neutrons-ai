@@ -15,6 +15,7 @@ import {
   BackgroundVariant,
   Controls,
   Panel,
+  MiniMap,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -22,7 +23,6 @@ import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
 import { nodeComponents } from "@/config/node-components";
 import { AddNodeButton } from "./add-node-button";
 
-// 2. Pastikan komponen pendukung juga ada (jangan sampai hilang saat refactor)
 export const EditorLoading = () => (
   <div className="flex items-center justify-center h-full w-full">
     <p>Loading Editor...</p>
@@ -77,6 +77,7 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
     >
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       <Controls />
+      <MiniMap />
       <Panel position="top-right">
         <AddNodeButton />
       </Panel>

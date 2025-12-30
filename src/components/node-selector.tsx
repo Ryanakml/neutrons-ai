@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { GlobeIcon, MousePointer2Icon } from "lucide-react";
 import { useReactFlow } from "@xyflow/react";
 import { toast } from "sonner";
-import { createId } from "@paralleldrive/cuid2"; 
+import { createId } from "@paralleldrive/cuid2";
 import {
   Sheet,
   SheetContent,
@@ -36,8 +36,8 @@ interface NodeSelectorProps {
 const triggerNodes: NodeTypeOption[] = [
   {
     type: NodeType.MANUAL_TRIGGER,
-    label: "Trigger Manually",
-    description: "Get started by clicking button",
+    label: "Manual Trigger",
+    description: "Start by clicking the Execute button",
     icon: MousePointer2Icon,
   },
 ];
@@ -45,8 +45,8 @@ const triggerNodes: NodeTypeOption[] = [
 const executionNodes: NodeTypeOption[] = [
   {
     type: NodeType.HTTP_REQUEST,
-    label: "HTTP REQUEST",
-    description: "Make a http req",
+    label: "HTTP Request",
+    description: "Send a request to any endpoint",
     icon: GlobeIcon,
   },
 ];
@@ -102,16 +102,20 @@ export function NodeSelector({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Add Workflow Node</SheetTitle>
-          <SheetDescription>
-            Choose a trigger to start or an action to execute.
+      <SheetContent
+        side="right"
+        className="w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-md"
+      >
+        <SheetHeader className="gap-2">
+          <SheetTitle className="text-lg font-semibold text-slate-900">
+            Add Workflow Node
+          </SheetTitle>
+          <SheetDescription className="text-sm text-slate-600">
+            Pick a trigger to start or an action to execute.
           </SheetDescription>
         </SheetHeader>
 
         <div className="mt-6 flex flex-col gap-6">
-          {/* Section Triggers */}
           <NodeGroup
             title="Triggers"
             options={triggerNodes}
@@ -120,7 +124,6 @@ export function NodeSelector({
 
           <Separator />
 
-          {/* Section Actions */}
           <NodeGroup
             title="Actions"
             options={executionNodes}
@@ -145,7 +148,7 @@ function NodeGroup({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
         {title}
       </h3>
       {options.map((node) => (
@@ -166,19 +169,27 @@ function NodeItem({
 
   return (
     <div
-      className="w-full flex items-center gap-4 p-4 rounded-lg cursor-pointer border hover:bg-accent transition-colors group"
+      className="group relative flex w-full items-center gap-4 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 shadow-sm transition hover:-translate-y-px hover:border-slate-300 hover:bg-white hover:shadow-md cursor-pointer"
       onClick={onClick}
     >
-      <div className="shrink-0 size-10 flex items-center justify-center bg-primary/10 group-hover:bg-primary/20 rounded-md transition-colors">
+      <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-linear-to-br from-slate-50 to-slate-100 text-slate-600 transition group-hover:border-slate-300 group-hover:from-white group-hover:to-slate-50">
         {typeof Icon === "string" ? (
-          <Image src={Icon} alt="" className="size-6 object-contain" />
+          <Image
+            src={Icon}
+            alt={node.label}
+            width={24}
+            height={24}
+            className="object-contain"
+          />
         ) : (
-          <Icon className="size-6 text-primary" />
+          <Icon className="size-6" />
         )}
       </div>
       <div className="flex flex-col text-left">
-        <span className="font-medium text-sm">{node.label}</span>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-sm font-semibold text-slate-900">
+          {node.label}
+        </span>
+        <span className="text-xs font-medium text-slate-500">
           {node.description}
         </span>
       </div>

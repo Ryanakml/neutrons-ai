@@ -29,7 +29,7 @@ const Page = async ({ params }: PageProps) => {
         <Suspense fallback={<EditorLoading />}>
           <div className="flex flex-col h-screen overflow-hidden">
             <EditorHeader workflowId={workflowId} />
-            <main className="flex-1 relative overflow-hidden bg-white">
+            <main className="flex-1 relative overflow-hidden bg-background">
               <Editor workflowId={workflowId} />
             </main>
           </div>

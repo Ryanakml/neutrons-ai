@@ -5,6 +5,8 @@ import { memo, useState } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
 import { GlobeIcon } from "lucide-react";
 import { HttpRequestDialog, HttpRequestFormValues } from "./dialog";
+import { useNodeStatus } from "../../hooks/use-node-status";
+import { fetchHttpRequestRealtimeToken } from "./actions";
 
 type HttpRequestNodeData = {
   variableName?: string;
@@ -35,6 +37,13 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
     ? `${nodeData.method || "GET"}: ${nodeData.endpoint}`
     : "Not configured";
 
+  const nodeStatus = useNodeStatus({
+    nodeId: props.id,
+    channel: "http-request-execution",
+    topic: "status",
+    refreshToken: fetchHttpRequestRealtimeToken,
+  });
+
   return (
     <>
       <HttpRequestDialog
@@ -48,7 +57,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
         id={props.id}
         icon={GlobeIcon}
         name="HTTP Request"
-        status="initial"
+        status={nodeStatus}
         description={description}
         onSettings={() => setDialogOpen(true)}
         onDoubleClick={() => setDialogOpen(true)}

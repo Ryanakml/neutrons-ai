@@ -33,6 +33,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useEffect } from "react";
 
 export const FormSchema = z.object({
+  variableName: z
+    .string()
+    .min(1, { message: "Variable name is required" })
+    .regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, {
+      message:
+        "Variable name must start with a letter or underscore and contain only letters, numbers, and underscores",
+    }),
   endpoint: z
     .string()
     .url({ message: "Please enter valid url" })
@@ -59,6 +66,7 @@ export const HttpRequestDialog = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
+      variableName: defaultValues.variableName || "",
       endpoint: defaultValues.endpoint || "",
       method: defaultValues.method || "GET",
       body: defaultValues.body || "",
@@ -128,7 +136,6 @@ export const HttpRequestDialog = ({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="endpoint"
@@ -141,6 +148,20 @@ export const HttpRequestDialog = ({
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="variableName"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Variable Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="MyApiCall" {...field} />
+                    </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}

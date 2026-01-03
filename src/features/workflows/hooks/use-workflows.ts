@@ -62,6 +62,23 @@ export const useUpdateWorkflowName = () => {
   return mutation;
 };
 
+export const useExecuteWorkflow = () => {
+  const trpc = useTRPC();
+
+  const mutation = useMutation(
+    trpc.workflows.execute.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(`Workflow ${data.name} is running ...`);
+      },
+      onError: (error) => {
+        toast.error(`Failed to run workflow: ${error.message}`);
+      },
+    })
+  );
+
+  return mutation;
+};
+
 export const useUpdateWorkflow = () => {
   const queryClient = useQueryClient();
   const trpc = useTRPC();

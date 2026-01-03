@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, memo } from "react";
 import {
   ReactFlow,
   addEdge,
@@ -18,18 +18,18 @@ import {
   MiniMap,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-
 import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
 import { nodeComponents } from "@/config/node-components";
 import { AddNodeButton } from "./add-node-button";
 import { useSetAtom } from "jotai";
 import { editorAtom } from "../store/atoms";
 import { AlertCircle, Loader2 } from "lucide-react";
+import { NodeType } from "@/config/node-types";
+import { ExecuteWorkflowButton } from "./execute-workflow-button";
 
 export const EditorLoading = () => (
   <div className="flex flex-col items-center justify-center h-full w-full gap-3 bg-background/50 backdrop-blur-sm">
     <Loader2 className="size-8 animate-spin text-primary" />
-
     <div className="flex flex-col items-center gap-1">
       <p className="text-sm font-medium text-foreground">
         Preparing your workspace
@@ -40,15 +40,18 @@ export const EditorLoading = () => (
     </div>
   </div>
 );
+EditorLoading.displayName = "EditorLoading";
 
 export const EditorError = () => (
   <div className="flex flex-col items-center justify-center h-full w-full gap-2 text-red-500">
-    <AlertCircle className="size-6 animate-pulse" />{" "}
+    <AlertCircle className="size-6 animate-pulse" />
     <p className="text-sm font-medium">
       Error loading editor, please refresh the page!
     </p>
   </div>
 );
+EditorError.displayName = "EditorError";
+
 interface WorkflowData {
   id: string;
   name: string;
@@ -56,7 +59,7 @@ interface WorkflowData {
   edges: Edge[];
 }
 
-export const Editor = ({ workflowId }: { workflowId: string }) => {
+export const Editor = memo(({ workflowId }: { workflowId: string }) => {
   const { data } = useSuspenseWorkflow(workflowId);
   const workflow = data as unknown as WorkflowData;
 
@@ -76,6 +79,10 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
   const onConnect: OnConnect = useCallback((params) => {
     setEdges((eds) => addEdge(params, eds));
   }, []);
+
+  const hasManualTrigger = useMemo(() => {
+    return nodes.some((node) => node.type === NodeType.MANUAL_TRIGGER);
+  }, [nodes]);
 
   const canvasBackground = "var(--muted)";
   const gridColor = "var(--muted-foreground)";
@@ -118,6 +125,13 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
       <Panel position="top-right">
         <AddNodeButton />
       </Panel>
+      {hasManualTrigger && (
+        <Panel position="bottom-center">
+          <ExecuteWorkflowButton workflowId={workflowId} />
+        </Panel>
+      )}
     </ReactFlow>
   );
-};
+});
+
+Editor.displayName = "Editor";

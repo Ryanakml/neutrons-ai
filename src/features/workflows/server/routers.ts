@@ -5,8 +5,30 @@ import { z } from "zod";
 import { uniqueNamesGenerator, animals } from "unique-names-generator";
 import { NodeType } from "@prisma-generated/index";
 import type { Edge, Node } from "@xyflow/react";
+import { inngest } from "@/inngest/client";
 
 export const workflowsRouter = createTRPCRouter({
+  // Inngest Backround Jobs Procedure
+  execute: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const workflow = await prisma.workflow.findFirstOrThrow({
+        where: {
+          id: input.id,
+          userId: ctx.auth.user.id,
+        },
+      });
+
+      await inngest.send({
+        name: "workflows/execute.workflow",
+        data: {
+          workflowId: input.id,
+        },
+      });
+
+      return workflow;
+    }),
+
   // New Workflow
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1).optional() }).optional())

@@ -1,45 +1,45 @@
-import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
-// import { prisma } from "../lib/db";
+import { NonRetriableError } from "inngest";
 import { inngest } from "./client";
+import { prisma } from "@/lib/db";
+import { topologicalSort } from "./utils";
+import { NodeType } from "@prisma-generated/index";
+import { getExecutor } from "@/features/executions/lib/executor-registry";
 
-export const execute = inngest.createFunction(
-  { id: "workflow-ai-generate", retries: 3 },
-  { event: "workflow/ai.generate" },
+export const executeWorkflow = inngest.createFunction(
+  { id: "execute-workflow" },
+  { event: "workflows/execute.workflow" },
   async ({ event, step }) => {
-    const { workflowId, prompt } = event.data;
+    const workflowId = event.data.workflowId;
 
-    if (typeof workflowId !== "string") {
-      throw new Error("Invalid or missing workflowId");
+    if (!workflowId) {
+      throw new NonRetriableError("Workflow id is missing!");
     }
 
-    const safePrompt = typeof prompt === "string" ? prompt : "Generate text.";
-
-    const text = await step.run("gemini-generate-text", async () => {
-      const result = await generateText({
-        model: google("gemini-2.5-flash"),
-        system: "You are a helpful assistant.",
-        prompt: safePrompt,
+    const sortedNodes = await step.run("prepare-workflow", async () => {
+      const workflow = await prisma.workflow.findUniqueOrThrow({
+        where: { id: workflowId },
+        include: {
+          nodes: true,
+          connections: true,
+        },
       });
-      return result.text;
+      return topologicalSort(workflow.nodes, workflow.connections);
     });
 
-    // await step.run("update-database", async () => {
-    //   await prisma.workflow.update({
-    //     where: { id: workflowId },
-    //     data: { aiResult: text ?? "No result" },
-    //   });
-    // });
+    let context = event.data.initialData || {};
 
-    return { workflowId, text };
-  }
-);
-
-export const handleFailure = inngest.createFunction(
-  { id: "ai-failure-handler" },
-  { event: "inngest/function.failed" },
-  async ({ event }) => {
-    const { error, function_id } = event.data;
-    console.error(`Fungsi ${function_id} gagal total:`, error);
+    for (const node of sortedNodes) {
+      const executor = getExecutor(node.type as NodeType);
+      context = await executor({
+        data: node.data as Record<string, unknown>,
+        nodeId: node.id,
+        context,
+        step,
+      });
+    }
+    return {
+      workflowId,
+      result: context,
+    };
   }
 );

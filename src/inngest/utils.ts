@@ -1,5 +1,6 @@
 import toposort from "toposort";
 import { Connection, Node } from "@prisma-generated/index";
+import { inngest } from "./client";
 
 export const topologicalSort = (
   nodes: Node[],
@@ -39,4 +40,18 @@ export const topologicalSort = (
     // 2. Fallback: Jika yang dilempar bukan Error (misal string/null)
     throw new Error("An unexpected error occurred during sorting");
   }
+};
+
+export const sendWorkflowExectution = async (data: {
+  workflowId: string;
+  initialData?: Record<string, unknown>;
+  [key: string]: unknown;
+}) => {
+  return inngest.send({
+    name: "workflows/execute.workflow",
+    data: {
+      workflowId: data.workflowId,
+      initialData: data.initialData,
+    },
+  });
 };

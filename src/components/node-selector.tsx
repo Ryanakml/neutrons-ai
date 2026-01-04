@@ -40,6 +40,12 @@ const triggerNodes: NodeTypeOption[] = [
     description: "Start by clicking the Execute button",
     icon: MousePointer2Icon,
   },
+  {
+    type: NodeType.GOOGLE_FORM_TRIGGER,
+    label: "Google Form",
+    description: "When a Google Form is submitted",
+    icon: "/form.svg",
+  },
 ];
 
 const executionNodes: NodeTypeOption[] = [

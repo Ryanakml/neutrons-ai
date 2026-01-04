@@ -18,23 +18,21 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const formData = {
-      formId: body.formId,
-      title: body.title || body.formTitle,
-      responseId: body.responseId,
-      timestamp: body.timestamp,
-      respondentEmail: body.respondentEmail,
-      responses: body.responses,
-      raw: body,
+    const stripeData = {
+      // event metadata
+      eventId: body.id,
+      eventType: body.type,
+      timestamp: body.created,
+      livemode: body.livemode,
+      raw: body.data?.object,
     };
 
     await sendWorkflowExecution({
       workflowId: workflowId,
       initialData: {
-        googleForm: formData,
+        stripe: stripeData,
       },
     });
-
     return NextResponse.json(
       {
         success: true,
@@ -43,11 +41,11 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error handling Google Form workflow:", error);
+    console.error("Error handling Stripe workflow:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to process Google Form workflow.",
+        message: "Failed to process Stripe workflow.",
       },
       { status: 500 }
     );

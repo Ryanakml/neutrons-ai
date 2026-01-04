@@ -6,6 +6,7 @@ import { uniqueNamesGenerator, animals } from "unique-names-generator";
 import { NodeType } from "@prisma-generated/index";
 import type { Edge, Node } from "@xyflow/react";
 import { inngest } from "@/inngest/client";
+import { sendWorkflowExectution } from "@/inngest/utils";
 
 export const workflowsRouter = createTRPCRouter({
   // Inngest Backround Jobs Procedure
@@ -24,6 +25,10 @@ export const workflowsRouter = createTRPCRouter({
         data: {
           workflowId: input.id,
         },
+      });
+
+      await sendWorkflowExectution({
+        workflowId: input.id,
       });
 
       return workflow;

@@ -3,6 +3,7 @@ export const NODE_TYPES = [
   "MANUAL_TRIGGER",
   "HTTP_REQUEST",
   "GOOGLE_FORM_TRIGGER",
+  "STRIPE_TRIGGER",
 ] as const;
 
 export const NodeType = {
@@ -10,6 +11,7 @@ export const NodeType = {
   MANUAL_TRIGGER: "MANUAL_TRIGGER",
   HTTP_REQUEST: "HTTP_REQUEST",
   GOOGLE_FORM_TRIGGER: "GOOGLE_FORM_TRIGGER",
+  STRIPE_TRIGGER: "STRIPE_TRIGGER",
 } as const;
 
 export type NodeType = (typeof NODE_TYPES)[number];

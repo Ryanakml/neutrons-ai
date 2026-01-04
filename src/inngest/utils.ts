@@ -42,7 +42,7 @@ export const topologicalSort = (
   }
 };
 
-export const sendWorkflowExectution = async (data: {
+export const sendWorkflowExecution = async (data: {
   workflowId: string;
   initialData?: Record<string, unknown>;
   [key: string]: unknown;

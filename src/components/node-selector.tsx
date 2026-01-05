@@ -61,6 +61,18 @@ const executionNodes: NodeTypeOption[] = [
     description: "Send a request to any endpoint",
     icon: GlobeIcon,
   },
+  {
+    type: NodeType.GEMINI,
+    label: "Gemini",
+    description: "Use Gemini AI to generate content",
+    icon: "/gemini.png",
+  },
+  {
+    type: NodeType.GROQ,
+    label: "Groq",
+    description: "Use Groq-hosted LLMs to generate content",
+    icon: "/groq.png",
+  },
 ];
 
 // Main Component

@@ -31,36 +31,50 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({
   step,
   publish,
 }) => {
+  const publishErrorStatus = async (message: string) => {
+    await publish(
+      groqChannel().status({
+        nodeId,
+        status: "error",
+        message,
+      })
+    );
+  };
+
   await publish(groqChannel().status({ nodeId, status: "loading" }));
 
   if (!data.variableName) {
-    await publish(groqChannel().status({ nodeId, status: "loading" }));
-    throw new NonRetriableError("Groq Node: Variable name is required");
+    const message = "Groq Node: Variable name is required";
+    await publishErrorStatus(message);
+    throw new NonRetriableError(message);
   }
 
   if (!data.userPrompt) {
-    await publish(groqChannel().status({ nodeId, status: "loading" }));
-    throw new NonRetriableError("Groq Node: User prompt is required");
+    const message = "Groq Node: User prompt is required";
+    await publishErrorStatus(message);
+    throw new NonRetriableError(message);
   }
-
-  const systemPrompt = data.systemPrompt
-    ? HandleBars.compile(data.systemPrompt)(context)
-    : "you are a helpful assistant";
-
-  const userPrompt = data.userPrompt
-    ? HandleBars.compile(data.userPrompt)(context)
-    : "";
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    throw new NonRetriableError("Groq API key is not configured");
+    const message = "Groq API key is not configured";
+    await publishErrorStatus(message);
+    throw new NonRetriableError(message);
   }
 
-  const groq = createGroq({
-    apiKey,
-  });
-
   try {
+    const systemPrompt = data.systemPrompt
+      ? HandleBars.compile(data.systemPrompt)(context)
+      : "you are a helpful assistant";
+
+    const userPrompt = data.userPrompt
+      ? HandleBars.compile(data.userPrompt)(context)
+      : "";
+
+    const groq = createGroq({
+      apiKey,
+    });
+
     const { steps } = await step.ai.wrap("groq-generate-text", generateText, {
       model: groq(data.model || "llama-3.1-8b-instant"),
       system: systemPrompt,
@@ -89,6 +103,12 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({
       },
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.stack || error.message
+        : "Groq Node: Unknown error occurred";
+
+    await publishErrorStatus(errorMessage);
     throw error;
   }
 };

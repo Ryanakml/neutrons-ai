@@ -7,6 +7,7 @@ import { GoogleFormTrigger } from "@/features/triggers/components/google-form-tr
 import { StripeTriggerNode } from "@/features/triggers/components/stripe-trigger/node";
 import { GeminiNode } from "@/features/executions/components/gemini/node";
 import { GroqNode } from "@/features/executions/components/groq/node";
+import { DiscordNode } from "@/features/executions/components/discord/node";
 
 export const nodeComponents = {
   [NodeType.INITIAL]: InitialNode,
@@ -16,6 +17,8 @@ export const nodeComponents = {
   [NodeType.STRIPE_TRIGGER]: StripeTriggerNode,
   [NodeType.GEMINI]: GeminiNode,
   [NodeType.GROQ]: GroqNode,
+  [NodeType.DISCORD]: DiscordNode, // Placeholder, replace with actual Discord node component
+  // [NodeType.SLACK]: SlackNode, // Placeholder, replace with actual Slack node component
 } as const satisfies NodeTypes;
 
 export type RegisteredNodeTypes = keyof typeof nodeComponents;

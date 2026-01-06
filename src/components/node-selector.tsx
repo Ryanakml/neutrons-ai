@@ -73,6 +73,12 @@ const executionNodes: NodeTypeOption[] = [
     description: "Use Groq-hosted LLMs to generate content",
     icon: "/groq.png",
   },
+  {
+    type: NodeType.DISCORD,
+    label: "Discord",
+    description: "Use Discord AI to generate content",
+    icon: "/discord.svg",
+  },
 ];
 
 // Main Component

@@ -6,6 +6,8 @@ export const NODE_TYPES = [
   "STRIPE_TRIGGER",
   "GEMINI",
   "GROQ",
+  "DISCORD",
+  "SLACK",
 ] as const;
 
 export const NodeType = {
@@ -16,6 +18,8 @@ export const NodeType = {
   STRIPE_TRIGGER: "STRIPE_TRIGGER",
   GEMINI: "GEMINI",
   GROQ: "GROQ",
+  DISCORD: "DISCORD",
+  SLACK: "SLACK",
 } as const;
 
 export type NodeType = (typeof NODE_TYPES)[number];

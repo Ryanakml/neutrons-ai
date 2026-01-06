@@ -97,6 +97,8 @@ enum NodeType {
   STRIPE_TRIGGER
   GEMINI
   GROQ
+  DISCORD
+  SLACK
 }
 
 model Node {

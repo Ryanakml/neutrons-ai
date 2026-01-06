@@ -32,16 +32,28 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
   step,
   publish,
 }) => {
+  const publishErrorStatus = async (message: string) => {
+    await publish(
+      geminiChannel().status({
+        nodeId,
+        status: "error",
+        message,
+      })
+    );
+  };
+
   await publish(geminiChannel().status({ nodeId, status: "loading" }));
 
   if (!data.variableName) {
-    await publish(geminiChannel().status({ nodeId, status: "loading" }));
-    throw new NonRetriableError("Gemini Node: Variable name is required");
+    const message = "Gemini Node: Variable name is required";
+    await publishErrorStatus(message);
+    throw new NonRetriableError(message);
   }
 
   if (!data.userPrompt) {
-    await publish(geminiChannel().status({ nodeId, status: "loading" }));
-    throw new NonRetriableError("Gemini Node: User prompt is required");
+    const message = "Gemini Node: User prompt is required";
+    await publishErrorStatus(message);
+    throw new NonRetriableError(message);
   }
 
   // todo: check credentials
@@ -57,7 +69,9 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
   // todo: fetcth the API key from secure storage
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new NonRetriableError("Gemini API key is not configured");
+    const message = "Gemini API key is not configured";
+    await publishErrorStatus(message);
+    throw new NonRetriableError(message);
   }
 
   const google = createGoogleGenerativeAI({
@@ -93,6 +107,12 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       },
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.stack || error.message
+        : "Gemini Node: Unknown error occurred";
+
+    await publishErrorStatus(errorMessage);
     throw error;
   }
 };

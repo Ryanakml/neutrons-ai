@@ -17,13 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,14 +24,6 @@ import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect } from "react";
-
-const GROQ_MODELS = [
-  "llama-3.3-70b-versatile",
-  "llama-3.1-70b-versatile",
-  "llama-3.1-8b-instant",
-  "mixtral-8x7b-32768",
-  "gemma2-9b-it",
-] as const;
 
 export const FormSchema = z.object({
   variableName: z
@@ -48,43 +33,45 @@ export const FormSchema = z.object({
       message:
         "Variable name must contain only letters, numbers, and underscores",
     }),
-  model: z.enum(GROQ_MODELS),
-  systemPrompt: z.string().optional(),
-  userPrompt: z.string().min(1, { message: "User prompt is required" }),
+  username: z.string().optional(),
+  content: z.string().min(1, { message: "Content is required" }).max(2000, {
+    message: "Content must be at most 2000 characters",
+  }),
+  webhookUrl: z.string().min(1, { message: "Webhook URL is required" }),
 });
 
-export type GroqFormValues = z.infer<typeof FormSchema>;
+export type DiscordFormValues = z.infer<typeof FormSchema>;
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: GroqFormValues) => void;
-  defaultValues?: Partial<GroqFormValues>;
+  onSubmit: (values: DiscordFormValues) => void;
+  defaultValues?: Partial<DiscordFormValues>;
 }
 
-export const GroqDialog = ({
+export const DiscordDialog = ({
   open,
   onOpenChange,
   onSubmit,
   defaultValues = {},
 }: Props) => {
-  const form = useForm<GroqFormValues>({
+  const form = useForm<DiscordFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      variableName: defaultValues.variableName || "myApiCall",
-      model: defaultValues.model || "llama-3.1-8b-instant",
-      systemPrompt: defaultValues.systemPrompt || "",
-      userPrompt: defaultValues.userPrompt || "",
+      variableName: defaultValues.variableName || "myDiscord",
+      username: defaultValues.username || "",
+      content: defaultValues.content || "",
+      webhookUrl: defaultValues.webhookUrl || "",
     },
   });
 
   useEffect(() => {
     if (open) {
       form.reset({
-        variableName: defaultValues.variableName || "myApiCall",
-        model: defaultValues.model || "llama-3.1-8b-instant",
-        systemPrompt: defaultValues.systemPrompt || "",
-        userPrompt: defaultValues.userPrompt || "",
+        variableName: defaultValues.variableName || "myDiscord",
+        username: defaultValues.username || "",
+        content: defaultValues.content || "",
+        webhookUrl: defaultValues.webhookUrl || "",
       });
     }
   }, [open, defaultValues, form]);
@@ -94,7 +81,7 @@ export const GroqDialog = ({
     name: "variableName",
   });
 
-  const onHandleSubmit = (values: GroqFormValues) => {
+  const onHandleSubmit = (values: DiscordFormValues) => {
     onSubmit(values);
     onOpenChange(false);
   };
@@ -103,9 +90,9 @@ export const GroqDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Groq Configuration</DialogTitle>
+          <DialogTitle className="text-xl">Discord Configuration</DialogTitle>
           <DialogDescription>
-            Configure the AI model and prompts for this node.
+            Configure the Discord webhook setting to this node
           </DialogDescription>
         </DialogHeader>
 
@@ -122,13 +109,13 @@ export const GroqDialog = ({
                 <FormItem>
                   <FormLabel>Variable Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="myApiCall" {...field} />
+                    <Input placeholder="myDiscord" {...field} />
                   </FormControl>
                   <FormDescription className="text-xs">
                     Use this name to reference the result in other nodes:{" "}
                     <code>
                       {"{{"}
-                      {watchVariableName || "variableName"}.aiResponse{"}}"}
+                      {watchVariableName || "variableName"}.text{"}}"}
                     </code>
                   </FormDescription>
                   <FormMessage />
@@ -139,29 +126,19 @@ export const GroqDialog = ({
             {/* Model Selection Section */}
             <FormField
               control={form.control}
-              name="model"
+              name="webhookUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Model</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a model" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {GROQ_MODELS.map((m) => (
-                        <SelectItem key={m} value={m}>
-                          {m}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Webhook URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://discord.com/api/webhooks/..."
+                      {...field}
+                    />
+                  </FormControl>
                   <FormDescription className="text-xs">
-                    The Groq-hosted model to use for completion.
+                    The Discord webhook URL to send messages to. get this from
+                    your Discord channel settings.
                   </FormDescription>
                 </FormItem>
               )}
@@ -170,45 +147,37 @@ export const GroqDialog = ({
             {/* System Prompt Section */}
             <FormField
               control={form.control}
-              name="systemPrompt"
+              name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>System Prompt (Optional)</FormLabel>
+                  <FormLabel>Message Content</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="e.g., You are a helpful assistant that summarizes technical documentation."
+                      placeholder="Summary: {{myGemini.text}}"
                       className="min-h-24 resize-none"
                       {...field}
                     />
                   </FormControl>
                   <FormDescription className="text-xs">
-                    Sets the behavior of the assistant. Use{" "}
-                    <code>{"{{variables}}"}</code> for simple values or{" "}
-                    <code>{"{{json variable}}"}</code> to stringify objects.
+                    The message to send. use {"{{variables}}"} for simple value,
+                    or {"{{json variable}}"} to stringify objects.
                   </FormDescription>
                 </FormItem>
               )}
             />
 
-            {/* User Prompt Section */}
             <FormField
               control={form.control}
-              name="userPrompt"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>User Prompt</FormLabel>
+                  <FormLabel>Bot Username (optional)</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="e.g., Summarize this text: {{json httpResponse.data}}"
-                      className="min-h-32 resize-none"
-                      {...field}
-                    />
+                    <Input placeholder="workflow-bot" {...field} />
                   </FormControl>
                   <FormDescription className="text-xs">
-                    The prompt to send to the AI. You can inject dynamic data
-                    from previous nodes.
+                    overwrite the webhooks default bot username.
                   </FormDescription>
-                  <FormMessage />
                 </FormItem>
               )}
             />

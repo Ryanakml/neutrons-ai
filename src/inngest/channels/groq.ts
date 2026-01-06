@@ -4,5 +4,6 @@ export const groqChannel = channel("groq-execution").addTopic(
   topic("status").type<{
     nodeId: string;
     status: "loading" | "success" | "error";
+    message?: string;
   }>()
 );

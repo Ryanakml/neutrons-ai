@@ -48,7 +48,7 @@ export const discordExecutor: NodeExecutor<DiscordData> = async ({
   const content = decode(rawContent);
 
   const username = data.username
-    ? decode(HandleBars.compile(data.username)(content))
+    ? decode(HandleBars.compile(data.username)(context))
     : undefined;
 
   try {

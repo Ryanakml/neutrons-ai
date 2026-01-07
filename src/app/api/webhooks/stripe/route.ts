@@ -1,6 +1,8 @@
 import { sendWorkflowExecution } from "@/inngest/utils";
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   try {
     const url = new URL(request.url);

@@ -26,7 +26,7 @@ export function WorkflowsClient({ initialData }: { initialData: Workflow[] }) {
               totalCount: initialData.length,
               page: 1,
               pageSize: 100,
-              totalPages: 1,
+              totalPages: 1,    
               hasNextPage: false,
               hasPreviousPage: false,
             }

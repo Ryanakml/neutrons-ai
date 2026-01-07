@@ -147,9 +147,7 @@ export const EmptyView = ({ message, onNew }: EmptyViewProps) => {
         <EmptyMedia className="mb-4">
           <PackageOpenIcon className="size-16 text-muted-foreground/60" />
         </EmptyMedia>
-        <EmptyTitle className="text-xl font-bold">
-          Data Tidak Ditemukan
-        </EmptyTitle>
+        <EmptyTitle className="text-xl font-bold">There is no data</EmptyTitle>
       </EmptyHeader>
 
       {!!message && (
@@ -161,7 +159,7 @@ export const EmptyView = ({ message, onNew }: EmptyViewProps) => {
       {!!onNew && (
         <EmptyContent className="mt-8">
           <Button onClick={onNew} className="px-8 shadow-sm">
-            Buat Baru
+            Create new!
           </Button>
         </EmptyContent>
       )}

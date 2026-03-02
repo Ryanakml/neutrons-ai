@@ -1,8 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Neutrons AI
 
-## Getting Started
+A modern, visual workflow automation platform built with Next.js and React Flow. Automate complex processes by connecting nodes to create powerful workflows with AI, integrations, and custom triggers.
 
-First, run the development server:
+![Workflow Editor](src/app/mock.png)
+
+## Features
+
+- **Visual Workflow Builder** - Drag-and-drop interface to design complex automation workflows
+- **Node-Based Architecture** - Connect various node types to build sophisticated automation pipelines
+  - AI Nodes - Leverage AI for intelligent automation
+  - Form Nodes - Collect user input within workflows
+  - Trigger Nodes - Stripe, Discord, and Slack integrations
+  - Custom Nodes - Extend with custom functionality
+- **Real-Time Execution** - Monitor and track workflow execution in real-time
+- **Execution History** - View detailed logs and history of all workflow runs
+- **Authentication** - Secure user authentication and session management
+- **Database Integration** - Powered by Prisma for robust data persistence
+- **TypeScript Support** - Full type safety across the application
+
+## Installation
+
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, or pnpm package manager
+
+### Setup
+
+1. **Clone the repository**
+
+```bash
+git clone <repository-url>
+cd neutrons-ai
+```
+
+2. **Install dependencies**
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. **Set up environment variables**
+   Create a `.env.local` file in the root directory with your configuration:
+
+```bash
+# Database
+DATABASE_URL="your_database_url"
+
+# API Configuration
+API_URL="http://localhost:3000"
+
+# Other configurations
+# Add your environment variables here
+```
+
+4. **Set up the database**
+
+```bash
+npx prisma migrate dev
+```
+
+5. **Run the development server**
 
 ```bash
 npm run dev
@@ -10,27 +72,14 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Create a new workflow** - Start by creating a new workflow in the editor
+2. **Add nodes** - Select from the node palette to add nodes to your workflow
+3. **Connect nodes** - Draw connections between nodes to define the workflow logic
+4. **Configure nodes** - Set up parameters and configurations for each node
+5. **Deploy & Execute** - Deploy your workflow and monitor execution in real-time
